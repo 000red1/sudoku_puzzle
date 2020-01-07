@@ -8,5 +8,8 @@ import java.io.*;
 import javax.imageio.*;
 
 
-public class view {
+public class sudoku_view extends JPanel {
+    public sudoku_view(){
+        super();
+    }
 }
