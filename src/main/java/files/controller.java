@@ -28,6 +28,7 @@ public class controller implements ActionListener, MouseMotionListener, MouseLis
     JButton settingsButton = new JButton("Settings");
     JButton solveButton = new JButton("Solve");
     JButton backButton = new JButton("Back");
+    JButton resetButton = new JButton("Reset");
 
     //Settings
     JTextField numberBoxes[][] = new JTextField[9][9];
@@ -72,7 +73,7 @@ public class controller implements ActionListener, MouseMotionListener, MouseLis
     @Override
     public void mouseDragged(MouseEvent e) {
 
-        if(panel.blnGame && e.getX() >= 600 && e.getX() <= 665 && !panel.mouse){
+        if(panel.blnGame && e.getX() >= 615 && e.getX() <= 680 && !panel.mouse){
             System.out.println("mouse dragged");
             panel.imagedragged(e.getX(),e.getY());
             model.get_possible_number(e.getY());
@@ -98,6 +99,7 @@ public class controller implements ActionListener, MouseMotionListener, MouseLis
             changeButtonDisplay(settingsButton, false);
             changeButtonDisplay(solveButton, true);
             changeButtonDisplay(backButton, true);
+            changeButtonDisplay(resetButton,true);
             changeTextBoxesVisibility(true);
             panel.blnGame = true;
             model.setGamemode(2);
@@ -112,6 +114,7 @@ public class controller implements ActionListener, MouseMotionListener, MouseLis
             changeButtonDisplay(settingsButton, true);
             changeButtonDisplay(solveButton, false);
             changeButtonDisplay(backButton, false);
+            changeButtonDisplay(resetButton, false);
 
             changeTextBoxesVisibility(false);
             panel.gameboard();
@@ -124,9 +127,12 @@ public class controller implements ActionListener, MouseMotionListener, MouseLis
         else if(evt.getSource() == solveButton){
             System.out.println(model.solve());
             if(model.solve()){
-                System.out.println("test");
                 panel.solver(model.get_sudoku());
             }
+        }
+        else if(evt.getSource() == resetButton){
+            panel.gameboard();
+            model.setSudokuEmpty();
         }
 
     }
@@ -184,8 +190,8 @@ public class controller implements ActionListener, MouseMotionListener, MouseLis
         settingsButton.setBorderPainted(false);
         panel.add(settingsButton);
 
-        solveButton.setSize(250,120);
-        solveButton.setLocation(280,580);
+        solveButton.setSize(140,120);
+        solveButton.setLocation(230,580);
         solveButton.setFont(new Font(Font.DIALOG, Font.BOLD, 34));
         solveButton.setOpaque(false);
         solveButton.setContentAreaFilled(false);
@@ -195,8 +201,8 @@ public class controller implements ActionListener, MouseMotionListener, MouseLis
         panel.add(solveButton);
         solveButton.addActionListener(this);
 
-        backButton.setSize(250,120);
-        backButton.setLocation(30,580);
+        backButton.setSize(140,120);
+        backButton.setLocation(0,580);
         backButton.setFont(new Font(Font.DIALOG, Font.BOLD, 34));
         backButton.setOpaque(false);
         backButton.setContentAreaFilled(false);
@@ -206,6 +212,17 @@ public class controller implements ActionListener, MouseMotionListener, MouseLis
         panel.add(backButton);
         backButton.addActionListener(this);
 
+        resetButton.setSize(140,120);
+        resetButton.setLocation(480,580);
+        resetButton.setFont(new Font(Font.DIALOG, Font.BOLD, 34));
+        resetButton.setOpaque(false);
+        resetButton.setContentAreaFilled(false);
+        resetButton.setBorderPainted(false);
+        resetButton.setVisible(false);
+        resetButton.setEnabled(false);
+        panel.add(resetButton);
+        resetButton.addActionListener(this);
+
         for(int i = 0; i < 9; i++){
             for(int k = 0; k < 9; k++){
                 numberBoxes[i][k] = new JTextField();
@@ -213,6 +230,7 @@ public class controller implements ActionListener, MouseMotionListener, MouseLis
                 numberBoxes[i][k].setLocation(5+ 65*i,5+65*k);
                 numberBoxes[i][k].setFont(new Font(Font.DIALOG, Font.BOLD, 24));
                 numberBoxes[i][k].setOpaque(false);
+                numberBoxes[i][k].setBorder(null);
                 numberBoxes[i][k].setVisible(false);
                 numberBoxes[i][k].setEnabled(false);
                 panel.add(numberBoxes[i][k]);

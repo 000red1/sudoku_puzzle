@@ -195,8 +195,16 @@ public class sudoku_model{
 
     }
 
+    private int get_sudoku_number(){
+        return 0;
+    }
+
+    public int[][] generate_puzzle(){
+        int num;
+        return null;
+    }
+
     public boolean solve(){
-        System.out.println("solving????");
         solveSudoku();
         return checkFinished();
     }
