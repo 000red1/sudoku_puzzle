@@ -38,21 +38,33 @@ public class sudoku_view extends JPanel {
         imgNum9 = loadImage("9.png");
     }
 
-    public BufferedImage loadImage(String strNum){
+    public BufferedImage loadImage(String strNum) {
         BufferedImage image = null;
-        String strname = "images\\" + strNum;
-        try{
-            image = ImageIO.read(new File("1.png"));
-        }catch (IOException e){
+        String strname = "src/main/java/images/" + strNum;
+        try {
+            image = ImageIO.read(new File(strname));
+        } catch (IOException e) {
             System.out.println(strname);
+            e.printStackTrace();
         }
+
+
         return image;
     }
 
     public void paintComponent(Graphics g){
         super.paintComponent(g);
         if(blnGame){
-            g.drawImage(imgNum1, 500, 500,null);
+            g.drawImage(imgNum1, 600, 5,null);
+            g.drawImage(imgNum2, 600, 5 + 65,null);
+            g.drawImage(imgNum3, 600, 5 + 65*2,null);
+            g.drawImage(imgNum4, 600, 5 + 65*3,null);
+            g.drawImage(imgNum5, 600, 5 + 65*4,null);
+            g.drawImage(imgNum6, 600, 5 + 65*5,null);
+            g.drawImage(imgNum7, 600, 5 + 65*6,null);
+            g.drawImage(imgNum8, 600, 5 + 65*7,null);
+            g.drawImage(imgNum9, 600, 5 + 65*8,null);
+
         }
 
     }
