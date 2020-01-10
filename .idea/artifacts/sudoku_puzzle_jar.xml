@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="sudoku_puzzle:jar">
+    <output-path>$PROJECT_DIR$/classes/artifacts/sudoku_puzzle_jar</output-path>
+    <root id="archive" name="sudoku_puzzle.jar">
+      <element id="module-output" name="sudoku_puzzle" />
+    </root>
+  </artifact>
+</component>

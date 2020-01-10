@@ -9,8 +9,9 @@ import javax.imageio.*;
 
 public class controller implements ActionListener, MouseMotionListener, MouseListener {
 
-    JFrame frame = new JFrame("Test");
+    JFrame frame = new JFrame("Sudoku Game Version 0.2");
     sudoku_view panel = new sudoku_view();
+    sudoku_model model = new sudoku_model();
     Timer time;
 
     // 0: Title Screen
@@ -30,7 +31,7 @@ public class controller implements ActionListener, MouseMotionListener, MouseLis
 
     //Settings
     JTextField numberBoxes[][] = new JTextField[9][9];
-  /*  JLabel mousepressX = new JLabel("X coordinate of Press: ");
+/*    JLabel mousepressX = new JLabel("X coordinate of Press: ");
     JLabel mousepressY = new JLabel("Y coordinate of Press: ");
     JLabel mousepositionX = new JLabel("X coordinate of mouse: ");
     JLabel mousepositionY = new JLabel("Y coordinate of mouse: ");*/
@@ -44,16 +45,17 @@ public class controller implements ActionListener, MouseMotionListener, MouseLis
 
     @Override
     public void mousePressed(MouseEvent e) {
-        /*mousepressX.setText("X coordinate of Press: " + e.getX());
-        mousepressY.setText("Y coordinate of Press: " + e.getY());*/
 
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        /*mousepressX.setText("X coordinate of Press: " + e.getX());
-        mousepressY.setText("Y coordinate of Press: " + e.getY());*/
-
+        System.out.println("mouse released");
+        if(model.valid_placement(e.getX(),e.getY())){
+            int move = model.make_placement();
+            panel.updateboard(move);
+        }
+        panel.setmouse(false);
     }
 
     @Override
@@ -70,13 +72,18 @@ public class controller implements ActionListener, MouseMotionListener, MouseLis
     @Override
     public void mouseDragged(MouseEvent e) {
 
+        if(panel.blnGame && e.getX() >= 600 && e.getX() <= 665 && !panel.mouse){
+            System.out.println("mouse dragged");
+            panel.imagedragged(e.getX(),e.getY());
+            model.get_possible_number(e.getY());
+        }
+        panel.mousex = e.getX();
+        panel.mousey = e.getY();
+
     }
 
     @Override
     public void mouseMoved(MouseEvent e) {
-
-       /* mousepositionX.setText("X coordinate of Press: " + e.getX());
-        mousepositionY.setText("Y coordinate of Press: " + e.getY());*/
 
     }
 
@@ -93,6 +100,7 @@ public class controller implements ActionListener, MouseMotionListener, MouseLis
             changeButtonDisplay(backButton, true);
             changeTextBoxesVisibility(true);
             panel.blnGame = true;
+            model.setGamemode(2);
             panel.repaint();
 
         }
@@ -106,10 +114,19 @@ public class controller implements ActionListener, MouseMotionListener, MouseLis
             changeButtonDisplay(backButton, false);
 
             changeTextBoxesVisibility(false);
+            panel.gameboard();
+            model.setSudokuEmpty();
             panel.blnGame = false;
         }
         else if(evt.getSource() == time){
             panel.repaint();
+        }
+        else if(evt.getSource() == solveButton){
+            System.out.println(model.solve());
+            if(model.solve()){
+                System.out.println("test");
+                panel.solver(model.get_sudoku());
+            }
         }
 
     }
@@ -119,11 +136,11 @@ public class controller implements ActionListener, MouseMotionListener, MouseLis
         e.setVisible(flag);
     }
 
+
     public void changeTextBoxesVisibility(boolean flag){
         for(int i = 0; i < 9; i++){
             for(int k = 0; k < 9; k++){
                 numberBoxes[i][k].setVisible(flag);
-                numberBoxes[i][k].setEnabled(flag);
             }
         }
     }
@@ -132,22 +149,6 @@ public class controller implements ActionListener, MouseMotionListener, MouseLis
 
         panel.setLayout(null);
         panel.setPreferredSize(new Dimension(680,680));
-
-/*        mousepressX.setLocation(200,600);
-        mousepressX.setSize(200,100);
-        panel.add(mousepressX);
-
-        mousepressY.setLocation(400,600);
-        mousepressY.setSize(200,100);
-        panel.add(mousepressY);
-
-        mousepositionX.setLocation(200,500);
-        mousepositionX.setSize(200,100);
-        panel.add(mousepositionX);
-
-        mousepositionY.setLocation(400,500);
-        mousepositionY.setSize(200,100);
-        panel.add(mousepositionY);*/
 
         playButton.setSize(500, 160);
         playButton.setLocation(100,80);
@@ -192,6 +193,7 @@ public class controller implements ActionListener, MouseMotionListener, MouseLis
         solveButton.setVisible(false);
         solveButton.setEnabled(false);
         panel.add(solveButton);
+        solveButton.addActionListener(this);
 
         backButton.setSize(250,120);
         backButton.setLocation(30,580);
@@ -219,8 +221,8 @@ public class controller implements ActionListener, MouseMotionListener, MouseLis
 
         time = new Timer(100/60, this);
 
-        //panel.addMouseListener(this);
-        //panel.addMouseMotionListener(this);
+        panel.addMouseListener(this);
+        panel.addMouseMotionListener(this);
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setContentPane(panel);
