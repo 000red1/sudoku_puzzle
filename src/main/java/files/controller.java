@@ -9,7 +9,7 @@ import javax.imageio.*;
 
 public class controller implements ActionListener, MouseMotionListener, MouseListener {
 
-    JFrame frame = new JFrame("Sudoku Game Version 0.2");
+    JFrame frame = new JFrame("Sudoku Game Version 0.4");
     sudoku_view panel = new sudoku_view();
     sudoku_model model = new sudoku_model();
     Timer time;
@@ -29,6 +29,7 @@ public class controller implements ActionListener, MouseMotionListener, MouseLis
     JButton solveButton = new JButton("Solve");
     JButton backButton = new JButton("Back");
     JButton resetButton = new JButton("Reset");
+    JButton checkButton = new JButton("Check");
 
     //Settings
     JTextField numberBoxes[][] = new JTextField[9][9];
@@ -54,7 +55,7 @@ public class controller implements ActionListener, MouseMotionListener, MouseLis
         System.out.println("mouse released");
         if(model.valid_placement(e.getX(),e.getY())){
             int move = model.make_placement();
-            panel.updateboard(move);
+            panel.updateboard(move,model.gamemode == 1, model.gamemode == 1);
         }
         panel.setmouse(false);
     }
@@ -115,6 +116,7 @@ public class controller implements ActionListener, MouseMotionListener, MouseLis
             changeButtonDisplay(solveButton, false);
             changeButtonDisplay(backButton, false);
             changeButtonDisplay(resetButton, false);
+            changeButtonDisplay(checkButton,false);
 
             changeTextBoxesVisibility(false);
             panel.gameboard();
@@ -127,12 +129,37 @@ public class controller implements ActionListener, MouseMotionListener, MouseLis
         else if(evt.getSource() == solveButton){
             System.out.println(model.solve());
             if(model.solve()){
-                panel.solver(model.get_sudoku());
+                panel.solver(model.get_sudoku(),model.gamemode == 1);
+                model.setGamemode(0);
             }
         }
         else if(evt.getSource() == resetButton){
-            panel.gameboard();
-            model.setSudokuEmpty();
+            if(model.gamemode == 0) {
+                panel.gameboard();
+                model.setSudokuEmpty();
+                model.setGamemode(2);
+            }
+        }
+        else if(evt.getSource() == playButton){
+            changeButtonDisplay(playButton,false);
+            changeButtonDisplay(solverButton, false);
+            changeButtonDisplay(helpButton, false);
+            changeButtonDisplay(settingsButton, false);
+            changeButtonDisplay(backButton, true);
+            changeButtonDisplay(resetButton,true);
+            changeButtonDisplay(checkButton, true);
+            changeTextBoxesVisibility(true);
+
+            panel.blnGame = true;
+            model.setGamemode(1);
+            System.out.println("hereee");
+            panel.solver(model.generate_puzzle(),model.gamemode == 1);
+            panel.repaint();
+        }
+        else if(evt.getSource() == checkButton){
+
+            panel.checkPuzzle(model.get_sudoku());
+            panel.repaint();
         }
 
     }
@@ -163,6 +190,7 @@ public class controller implements ActionListener, MouseMotionListener, MouseLis
         playButton.setContentAreaFilled(false);
         playButton.setBorderPainted(false);
         panel.add(playButton);
+        playButton.addActionListener(this);
 
 
         solverButton.setSize(500, 160);
@@ -189,6 +217,17 @@ public class controller implements ActionListener, MouseMotionListener, MouseLis
         settingsButton.setContentAreaFilled(false);
         settingsButton.setBorderPainted(false);
         panel.add(settingsButton);
+
+        checkButton.setSize(140,120);
+        checkButton.setLocation(230,580);
+        checkButton.setFont(new Font(Font.DIALOG, Font.BOLD, 34));
+        checkButton.setOpaque(false);
+        checkButton.setContentAreaFilled(false);
+        checkButton.setBorderPainted(false);
+        checkButton.setVisible(false);
+        checkButton.setEnabled(false);
+        panel.add(checkButton);
+        checkButton.addActionListener(this);
 
         solveButton.setSize(140,120);
         solveButton.setLocation(230,580);

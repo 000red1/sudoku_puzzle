@@ -11,12 +11,13 @@ public class sudoku_model{
 
     int gamemode = 0;
     int sudoku_array[][] = new int[9][9];
+    int difficulty = 1;
     int num = 0;
     int x = -1;
     int y = -1;
 
     public void get_possible_number(int y){
-        num = (y-5) / 65 + 1;
+        num = (y - 5) / 65 + 1;
     }
 
     public boolean valid_placement(int x, int y){
@@ -40,13 +41,24 @@ public class sudoku_model{
     }
 
     public int make_placement(){
-        sudoku_array[x][y] = num;
+        if(gamemode == 2) {
+            sudoku_array[x][y] = num;
+        }
         return num;
     }
 
     public void setGamemode(int number){
         gamemode = number;
     }
+
+    public void setNum(int number){
+        this.num = number;
+    }
+
+    public void setDifficulty(int number){
+        difficulty = number;
+    }
+
 
     public sudoku_model(){
         setSudokuEmpty();
@@ -196,12 +208,61 @@ public class sudoku_model{
     }
 
     private int get_sudoku_number(){
-        return 0;
+        return (int)(Math.random() * 9) + 1;
     }
 
     public int[][] generate_puzzle(){
-        int num;
-        return null;
+        int numb = 0;
+        int level = 17;
+
+        setSudokuEmpty();
+        if(difficulty == 1){
+            level = 30;
+        }else if(difficulty == 2){
+            level = 24;
+        }
+        int x_position = get_sudoku_number() - 1;
+        int y_position = get_sudoku_number() - 1;
+
+        while(numb < 17){
+            int possible_num = get_sudoku_number();
+            while(sudoku_array[x_position][y_position] != 0) {
+                x_position = get_sudoku_number() - 1;
+                y_position = get_sudoku_number() - 1;
+            }
+            sudoku_array[x_position][y_position] = possible_num;
+            if(checkPuzzle()){
+                numb++;
+            } else{
+                sudoku_array[x_position][y_position] = 0;
+            }
+        }
+        int counter = 0;
+        System.out.println();
+        int[][] copy = new int[9][9];
+        for(int i = 0; i < 9; i++){
+            for(int k = 0; k< 9 ;k++){
+                copy[i][k] = sudoku_array[i][k];
+                System.out.print(copy[i][k]+" ");
+                if(copy[i][k] != 0){
+                    counter++;
+                }
+            }
+            System.out.println();
+        }
+        System.out.println(counter);
+        solveSudoku();
+        while(numb < level){
+            x_position = get_sudoku_number() - 1;
+            y_position = get_sudoku_number() - 1;
+            if(copy[x_position][y_position] == 0) {
+                copy[x_position][y_position] = sudoku_array[x_position][y_position];
+                numb++;
+            }
+        }
+        System.out.println(numb);
+
+        return copy;
     }
 
     public boolean solve(){
