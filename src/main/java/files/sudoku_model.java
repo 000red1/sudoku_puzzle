@@ -20,6 +20,8 @@ public class sudoku_model{
         num = (y - 5) / 65 + 1;
     }
 
+    public void set_possible_number(int y ) {num = y;}
+
     public boolean valid_placement(int x, int y){
         if(x < 5 || y < 5 || y > 5 + 65*9 || x > 5 + 65*9 || gamemode == 0){
             return false;
@@ -238,32 +240,49 @@ public class sudoku_model{
             }
         }
         int counter = 0;
-        System.out.println();
         int[][] copy = new int[9][9];
         for(int i = 0; i < 9; i++){
             for(int k = 0; k< 9 ;k++){
                 copy[i][k] = sudoku_array[i][k];
-                System.out.print(copy[i][k]+" ");
                 if(copy[i][k] != 0){
                     counter++;
                 }
             }
-            System.out.println();
         }
-        System.out.println(counter);
         solveSudoku();
+        int[][] numbers = {{1,2,3,4,5,6,7,8,0},{1,2,3,4,5,6,7,8,0}};
+        int multipler = 9;
         while(numb < level){
+            int x_index = (int)(Math.random() * multipler);
+            int inter_multi = 9;
+            int y_index = (int)(Math.random() * inter_multi);
+            for(inter_multi = 8; copy[numbers[0][x_index]][numbers[1][y_index]] != 0 && inter_multi > 0; inter_multi--){
+                numbers[1][y_index] = numbers[1][inter_multi];
+                numbers[1][inter_multi] = 0;
+                y_index = (int)(Math.random() * inter_multi);
+            }
+
             x_position = get_sudoku_number() - 1;
             y_position = get_sudoku_number() - 1;
             if(copy[x_position][y_position] == 0) {
                 copy[x_position][y_position] = sudoku_array[x_position][y_position];
                 numb++;
+                numbers = new int[][]{{1, 2, 3, 4, 5, 6, 7, 8, 0}, {1, 2, 3, 4, 5, 6, 7, 8, 0}};
+                multipler = 9;
+            }
+            else{
+                multipler--;
+                numbers[0][x_index] = numbers[1][multipler];
+                numbers[0][multipler] = 0;
+                for(int i = 0; i < 9; i++){
+                    numbers[1][i] = i;
+                }
             }
         }
-        System.out.println(numb);
 
         return copy;
     }
+
 
     public boolean solve(){
         solveSudoku();

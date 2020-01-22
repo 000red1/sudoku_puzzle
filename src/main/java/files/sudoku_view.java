@@ -104,25 +104,45 @@ public class sudoku_view extends JPanel {
         mouse = flag;
     }
 
-    public void imagedragged(int x, int y){
-        int multi = (y-5)/ 65;
-        dragged = imgNum[multi ][0];
-        setmouse(true);
-        y_difference = y - 5 -65*multi;
-        x_difference = x - 615;
+    public int imagedragged(int x, int y, boolean cas){
+        int multi = (y - 5) / 65;
+        if(cas){
+            dragged = imgNum[multi][0];
+            setmouse(true);
+            y_difference = y - 5 - 65 * multi;
+            x_difference = x - 615;
+            return 0;
+        }
+        else{
+            int x_position = (x-5)/ 65;
+            if(given_puzzle[x_position][multi] == 0 && tracker[x_position][multi] != 0){
+                int num;
+                dragged = imgNum[(num = tracker[x_position][multi])-1][0];
+                setmouse(true);
+                gameboard[x_position][multi] = null;
+                tracker[x_position][multi] = 0;
+                y_difference = y - 5 - 65 * multi;
+                x_difference = x -5 - 65 *x_position;
+                System.out.println(num);
+                return num;
+            }
+            dragged = null;
+        }
+        return -1;
     }
 
-    public void updateboard(int number, boolean boardNumber, boolean mode){
+    public void updateboard(int number, boolean boardNumber){
         int x = (mousex - 5) / 65;
         int y = (mousey - 5) / 65;
-        tracker[x][y] = number;
-        if(boardNumber && select_x != -1 && select_y != -1){
-            tracker[select_x][select_y] = 0;
-            gameboard[select_x][select_y] = null;
-        }
-        gameboard[x][y] = imgNum[number - 1][0];
-        if(!mode || given_puzzle[x][y] == 0) {
+        if(boardNumber && given_puzzle[x][y] == 0){
+            tracker[x][y] = number;
             gameboard[x][y] = imgNum[number - 1][0];
+            dragged = null;
+        }
+        else if(!boardNumber){
+            tracker[x][y] = number;
+            gameboard[x][y] = imgNum[number - 1][0];
+            dragged = null;
         }
     }
 
@@ -131,13 +151,33 @@ public class sudoku_view extends JPanel {
             for(int y = 0; y < 9; y++){
                 int number = sudoku_puzzle[x][y];
                 if(number != 0) {
-                    gameboard[x][y] = imgNum[number-1][1];
+                    if(mode){
+                        gameboard[x][y] = imgNum[number-1][1];
+                        tracker[x][y] = number;
+                    }
+                    else if (!mode && tracker[x][y] == 0 && given_puzzle[x][y] == 0){
+                        gameboard[x][y] = imgNum[number-1][1];
+                    }
+                    given_puzzle[x][y] =  number;
+                }
+                else if(number == 0 && !mode && tracker[x][y] != 0){
+                    number = tracker[x][y];
+                    gameboard[x][y] = imgNum[number-1][2];
                 }
             }
         }
-        if(mode){
-            given_puzzle = sudoku_puzzle;
-            tracker = sudoku_puzzle;
+    }
+
+    public void reset_board() {
+        for(int x = 0; x < 9; x++){
+            for(int y = 0; y < 9; y++){
+                int number = given_puzzle[x][y];
+                tracker[x][y] = number;
+                gameboard[x][y] = null;
+                if(number != 0){
+                    gameboard[x][y] = imgNum[number-1][1];
+                }
+            }
         }
     }
 
@@ -147,6 +187,7 @@ public class sudoku_view extends JPanel {
                 int number = solution[x][y];
                 if(tracker[x][y] != 0 && tracker[x][y] == number) {
                     gameboard[x][y] = imgNum[number-1][1];
+                    given_puzzle[x][y] = number;
                 }
                 if(tracker[x][y] != 0 && tracker[x][y] != number) {
                     gameboard[x][y] = imgNum[tracker[x][y]-1][2];
@@ -165,13 +206,8 @@ public class sudoku_view extends JPanel {
         }
     }
 
-    public int getSelectedBoardNumber(int x, int y){
-        select_x = (x-5)/65;
-        select_y = (y-5)/65;
-        if(x == -1 && y == -1){
-            return -1;
-        }
-        return tracker[select_x][select_y];
+    public void clearDragged(){
+        dragged = null;
     }
 
     public sudoku_view(){

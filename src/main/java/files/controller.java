@@ -32,7 +32,7 @@ public class controller implements ActionListener, MouseMotionListener, MouseLis
     JButton checkButton = new JButton("Check");
 
     //Settings
-    JTextField numberBoxes[][] = new JTextField[9][9];
+   // JTextField numberBoxes[][] = new JTextField[9][9];
 /*    JLabel mousepressX = new JLabel("X coordinate of Press: ");
     JLabel mousepressY = new JLabel("Y coordinate of Press: ");
     JLabel mousepositionX = new JLabel("X coordinate of mouse: ");
@@ -48,16 +48,37 @@ public class controller implements ActionListener, MouseMotionListener, MouseLis
     @Override
     public void mousePressed(MouseEvent e) {
 
+        if(panel.blnGame && e.getX() >= 615 && e.getX() <= 680 && !panel.mouse){
+            panel.imagedragged(e.getX(),e.getY(),true);
+            model.get_possible_number(e.getY());
+        }
+        else if(panel.blnGame && e.getX() <= 590 && e.getY() <= 590 && !panel.mouse){
+            int num = panel.imagedragged(e.getX(),e.getY(),false);
+            if(num > 0) {
+                model.set_possible_number(num);
+            }
+        }
+        panel.mousex = e.getX();
+        panel.mousey = e.getY();
+
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        System.out.println("mouse released");
-        if(model.valid_placement(e.getX(),e.getY())){
-            int move = model.make_placement();
-            panel.updateboard(move,model.gamemode == 1, model.gamemode == 1);
+        if(model.gamemode != 0) {
+            if (model.valid_placement(e.getX(), e.getY()) && panel.mouse ) {
+                int move = model.make_placement();
+                panel.updateboard(move, model.gamemode == 1);
+                panel.setmouse(false);
+            } else {
+                panel.clearDragged();
+                panel.setmouse(false);
+            }
         }
-        panel.setmouse(false);
+        if(model.gamemode == 0 && panel.mouse){
+            panel.clearDragged();
+            panel.setmouse(false);
+        }
     }
 
     @Override
@@ -73,12 +94,6 @@ public class controller implements ActionListener, MouseMotionListener, MouseLis
     // Mouse Motion Listener Methods
     @Override
     public void mouseDragged(MouseEvent e) {
-
-        if(panel.blnGame && e.getX() >= 615 && e.getX() <= 680 && !panel.mouse){
-            System.out.println("mouse dragged");
-            panel.imagedragged(e.getX(),e.getY());
-            model.get_possible_number(e.getY());
-        }
         panel.mousex = e.getX();
         panel.mousey = e.getY();
 
@@ -132,12 +147,20 @@ public class controller implements ActionListener, MouseMotionListener, MouseLis
                 panel.solver(model.get_sudoku(),model.gamemode == 1);
                 model.setGamemode(0);
             }
+            else{
+                panel.solver(new int[][] {{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},
+                        {0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},
+                        {0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0}}, model.gamemode == 1);
+            }
         }
         else if(evt.getSource() == resetButton){
-            if(model.gamemode == 0) {
+            if(model.gamemode != 1) {
                 panel.gameboard();
                 model.setSudokuEmpty();
                 model.setGamemode(2);
+            }
+            else if(model.gamemode == 1){
+                panel.reset_board();
             }
         }
         else if(evt.getSource() == playButton){
@@ -152,7 +175,7 @@ public class controller implements ActionListener, MouseMotionListener, MouseLis
 
             panel.blnGame = true;
             model.setGamemode(1);
-            System.out.println("hereee");
+            model.setSudokuEmpty();
             panel.solver(model.generate_puzzle(),model.gamemode == 1);
             panel.repaint();
         }
@@ -171,11 +194,11 @@ public class controller implements ActionListener, MouseMotionListener, MouseLis
 
 
     public void changeTextBoxesVisibility(boolean flag){
-        for(int i = 0; i < 9; i++){
+        /*for(int i = 0; i < 9; i++){
             for(int k = 0; k < 9; k++){
                 numberBoxes[i][k].setVisible(flag);
             }
-        }
+        }*/
     }
 
     public controller(){
@@ -262,7 +285,7 @@ public class controller implements ActionListener, MouseMotionListener, MouseLis
         panel.add(resetButton);
         resetButton.addActionListener(this);
 
-        for(int i = 0; i < 9; i++){
+        /*for(int i = 0; i < 9; i++){
             for(int k = 0; k < 9; k++){
                 numberBoxes[i][k] = new JTextField();
                 numberBoxes[i][k].setSize(65,65);
@@ -274,7 +297,7 @@ public class controller implements ActionListener, MouseMotionListener, MouseLis
                 numberBoxes[i][k].setEnabled(false);
                 panel.add(numberBoxes[i][k]);
             }
-        }
+        }*/
 
         time = new Timer(100/60, this);
 
